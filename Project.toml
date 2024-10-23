@@ -1,0 +1,13 @@
+name = "WykoOPDReader"
+uuid = "6da23c8c-444c-4310-aaa6-9150b66cb193"
+authors = ["Jaakko Ruohio <jaakkor2@gmail.com>"]
+version = "0.1.0"
+
+[compat]
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
