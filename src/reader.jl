@@ -9,17 +9,27 @@ Read Wyko OPD data set from file `fn`.
 using WykoOPDReader
 fn = joinpath(pathof(WykoOPDReader), "..", "..", "test", "demo.opd")
 data = readopd(fn)
+```
 
+## Plotting example
+
+Here `heatmap` is used for 2d-plotting, and `surface` is used for 3d-plotting.
+
+```julia
 # data to plot
 z = data["RAW_DATA"] * (haskey(data, "Wavelength") ? data["Wavelength"]/1000 : 1.0)
 (; x, y, colormap, nan_color) = prepplot(data)
 
 using GLMakie
 fig = Figure()
-ax = Axis(fig[1,1], aspect = DataAspect())
-hm = heatmap!(ax, x, y, z; colormap, nan_color)
-hm.inspector_label = (plot, index, position) -> "\$(x[index[1]]) \$(y[index[2]]) \$(position[3])"
-Colorbar(fig[1,2], hm, width = Relative(1/10))
+ax1 = Axis(fig[1,1], aspect = DataAspect())
+hidedecorations!(ax1)
+hm = heatmap!(ax1, x, y, z; colormap, nan_color)
+#hm.inspector_label = (plot, index, position) -> "\$(x[index[1]]) \$(y[index[2]]) \$(position[3])"
+ax2 = LScene(fig[1,2], show_axis = false)
+sf = surface!(ax2, x, y, z; colormap)
+scale!(ax2.scene, 1, 1, 100) # scale z-axis
+cb = Colorbar(fig[1,3], hm, height = Relative(3/4), tellheight = true, minorticksvisible = true) # 
 DataInspector()
 ```
 """
@@ -37,7 +47,6 @@ function readopd(fn)
     end
     for i = 2:n_entries
         (; name, type, len, dunno) = entries[i]
-#        name == "" || @show name, type, len, dunno, "OPP"
         if name == ""
             continue
         elseif type == 3
@@ -49,7 +58,7 @@ function readopd(fn)
         elseif type in [7,8] # 7=Float32, 8=Float64
             push!(data, name => readfloat(io, len))
         elseif type == 15
-            push!(data, name => read15(io, len))
+            push!(data, name => readtype15(io))
         else
             @show "This is unknown: ", name, type, len, dunno
         end
@@ -84,11 +93,7 @@ readstring(io, n) = rstrip(String(read(io, n)), '\0')
 readfloat(io, n) = reinterpret(n == 4 ? Float32 : Float64, read(io, n))[1]
 readint(io, n) = reinterpret(n == 4 ? Int32 : n == 2 ? Int16 : Int8, read(io, n))[1]
 
-function read15(io, n)
-    readnext(io)
-end
-
-function readnext(io)
+function readtype15(io)
     type = read(io, 1)[1]
     if type == 1 # bool?
         reinterpret(Bool, read(io, 1)[1])
@@ -114,8 +119,9 @@ function readnext(io)
         len = reinterpret(Int32, read(io, 4))[1]
         s1 = String(read(io, len))
         lenbytes = read(io, 1)[1]
-        len = reinterpret(lenbytes == 1 ? UInt8 : UInt16, read(io, lenbytes))[1]
+        len_ = reinterpret(lenbytes == 1 ? UInt8 : UInt16, read(io, lenbytes))[1]
         len = reinterpret(Int32, read(io, 4))[1]
+        len_ == len + 4 || @warn "Fix something for type 66?"
         s2 = String(read(io, len))
         s1, s2
     else
@@ -141,7 +147,7 @@ function readnext(io)
                     break
                 end
                 s1 = String(read(io, len1))
-                v1 = readnext(io)
+                v1 = readtype15(io)
                 push!(res, s1 => v1)
             end
             res
