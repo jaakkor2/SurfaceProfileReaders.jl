@@ -2,7 +2,7 @@
     WykoOPDReader
 
 Reader for WYKO OPD data sets (.opd) implemented in Julia.
-Exports `readopd`.
+Exports `readopd` and `prepplot`.
 """
 module WykoOPDReader
 

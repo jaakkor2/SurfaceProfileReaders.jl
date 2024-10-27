@@ -17,19 +17,18 @@ Here `heatmap` is used for 2d-plotting, and `surface` is used for 3d-plotting.
 
 ```julia
 # data to plot
-z = data["RAW_DATA"] * (haskey(data, "Wavelength") ? data["Wavelength"]/1000 : 1.0)
-(; x, y, colormap, nan_color) = prepplot(data)
+(; x, y, z, colormap, nan_color) = prepplot(data)
 
 using GLMakie
 fig = Figure()
 ax1 = Axis(fig[1,1], aspect = DataAspect())
 hidedecorations!(ax1)
 hm = heatmap!(ax1, x, y, z; colormap, nan_color)
-#hm.inspector_label = (plot, index, position) -> "\$(x[index[1]]) \$(y[index[2]]) \$(position[3])"
+hm.inspector_label = (plot, index, position) -> "\$(x[index[1]]) \$(y[index[2]]) \$(position[3])"
 ax2 = LScene(fig[1,2], show_axis = false)
 sf = surface!(ax2, x, y, z; colormap)
 scale!(ax2.scene, 1, 1, 100) # scale z-axis
-cb = Colorbar(fig[1,3], hm, height = Relative(3/4), tellheight = true, minorticksvisible = true) # 
+cb = Colorbar(fig[1,3], hm, height = Relative(3/4), tellheight = true, minorticksvisible = true)
 DataInspector()
 ```
 """
