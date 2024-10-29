@@ -1,7 +1,7 @@
-using WykoOPDReader
+using SurfaceProfileReaders
 using Test
 
-@testset "WykoOPDReader.jl" begin
+@testset "Wyko OPD" begin
     data = readopd("demo.opd")
     @test data["Pixel_size"] == 0.01f0
     @test data["Aspect"] == 1.5

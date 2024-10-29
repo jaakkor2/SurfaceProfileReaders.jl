@@ -1,12 +1,13 @@
-# WykoOPDReader
+# SurfaceProfileReaders
 
-[![Build Status](https://github.com/jaakkor2/WykoOPDReader.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/jaakkor2/WykoOPDReader.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Build Status](https://github.com/jaakkor2/SurfaceProfileReaders.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/jaakkor2/SurfaceProfileReaders.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
-Reader for Wyko OPD surface profiler datasets (.opd) written in Julia language.  Format seems to be best described in [ReadOPD.m](https://github.com/kranthibalusu/Crystal-plasticity-/blob/master/ProfileAnalysis/ReadOPD.m) by Veeco.
+Reader for surface profiler data sets written in Julia language. Implemented formats
+* Wyko OPD
 
 ```julia
-using WykoOPDReader
+using SurfaceProfileReaders
 data = readopd("profile.opd")
-(; x, y, z) = prepplot(data)
+(; x, y, z) = opdprepplot(data)
 ```
 See `?readopd` for a plotting example.
