@@ -4,6 +4,7 @@
 
 Reader for surface profiler data sets written in Julia language. Implemented formats
 * Wyko OPD
+* MicroProf FRT
 
 ```julia
 using SurfaceProfileReaders
